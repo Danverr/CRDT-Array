@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/CRDT_Hometask.dir/main.cpp.o  -o CRDT_Hometask  lib/libgtest_main.a lib/libgtest.a -lpthread 
