@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/CRDT Hometask.iml" filepath="$PROJECT_DIR$/.idea/CRDT Hometask.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CRDT-Array.iml" filepath="$PROJECT_DIR$/.idea/CRDT-Array.iml" />
     </modules>
   </component>
 </project>
