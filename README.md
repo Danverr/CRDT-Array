@@ -15,13 +15,14 @@ This tree stores only IDs, so to get other information I use hash tables.
 
 ## Operations
 
+_N - current Nodes count, M - current and deleted Nodes count_
+
 ### Insert
 
 The main problem with inserting a new element is finding the right ID for it. To do this, we must go through 
 parent Node's children: if there is 2(!) more places to insert, we just make new node here with the lexicographically largest possible ID.
 In the other case we need to check possible ID values among children of Node with ID ```parent_id + MIN_CHAR```.
 
-_N - current Nodes count, M - current and deleted Nodes count_
 _Complexity: O(log(M)) in best case and O(M) in worst (on a bamboo trie)_  
 
 ### Erase
