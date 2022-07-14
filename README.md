@@ -1,40 +1,34 @@
-What algorithms and data structures you have chosen. Why?
-What are the alternatives you have considered
-Where are design tradeoffs, optimizations required, e.t.c
-
 ## Structure description
 
 My solution based on LSEQ CRDT data structure, so basically there are only 2 main parts: 
 elements with ID trie and their public representation. 
 
 **Elements**. 
-Every element in my array is a tree Node, which consists of its string ID, int value and an array of children.
-Because array length is changing, unique IDs for every item is a necessary for synchronizing operations between all clients.
-All together they make up an ID trie, DFS traversal of which gives us elements IDs in lexicographic order. 
+Every element in my array is a tree Node, which consists of its string ID (unique ID + replica ID), int value and an array of children.
+All together they make up an ID trie, DFS traversal of which gives us elements IDs in lexicographic order.
+_Note, that this trie is not implemented explicitly, but I'm traversing it with BFS in CrdtArray constructor_ 
 
 **Array representation**. 
 For public representation I used order statistic tree (I'll use OST to be short) from policy based data structures (PBDS) C++ standard library.
-It contains ordered IDs of current array elements and can erase elements, find element by ID and by its index just in O(log(n)) in worst case.
-But this tree stores only IDs, to get values I'm using hash table of shared pointers to Nodes.
+It contains ordered IDs of current array elements and can perform erase/find by value/find by index operations just in O(log(n)).
+This tree stores only IDs, so to get other information I use hash tables.
 
 ## Operations
 
 ### Insert
 
 The main problem with inserting a new element is finding the right ID for it. To do this, we must go through 
-parent node's children: if there is some place to insert (i.e. children count is less than ID alphabet, in our case it's 94),
-we just make new node here with the lexicographically smallest possible ID. 
-In the other case we need to set a new value for the far left child and perform the insert operation for it with its own old value.
+parent Node's children: if there is 2(!) more places to insert, we just make new node here with the lexicographically largest possible ID.
+In the other case we need to check possible ID values among children of Node with ID ```parent_id + MIN_CHAR```.
 
-_Complexity: O(log(N)) in best case and O(M) in worst (on a bamboo trie)_  
 _N - current Nodes count, M - current and deleted Nodes count_
+_Complexity: O(log(M)) in best case and O(M) in worst (on a bamboo trie)_  
 
 ### Erase
 
-Erasing is quite simple here: we only need to delete given ID from the OST and hash table.
-Actual Node cannot be deleted due to possible operations with deleted elements, like insert after it or update.
+Erase is quite simple here: we only need to delete given ID from the OST.
 
-_Complexity: O(log(N)) in average and O(N) in worst case (when hash table needs reallocation)_
+_Complexity: O(log(N))_
 
 ### Update
 
@@ -44,15 +38,16 @@ _Complexity: O(log(N))_
 
 ### Array creation
 
-Array creation consists of building a balanced Trie via BFS for allocating Nodes and DFS for setting values.
+Array creation consists of building a balanced Trie via BFS through possible IDs in lexicographic order with QuickSort.
 
 _Complexity: O(N*log(N))_
+
 
 ## Tradeoffs
 
 **Trie is not rebalancing**. As you can see, insert time is very dependent on the trie depth, but the problem is that
-we can't rebalance it on a go, because in this case we need to change elements IDs. Trie restructure can be done 
-only when all clients are online and can download the latest balanced array version without deleted Nodes simultaneously.
+we can't rebalance it on a go, because in this case we need to change elements IDs. Trie restructure can be done
+only when all clients are online and can download the balanced version simultaneously.
 But the good news is that on a large amounts of data it will grow slowly, especially if there can be up to 94 children for
 each Node. It gives us starting tree depth around log_94(N), which is only 4 for 1e7 elements!
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(CRDT_Hometask)
+project(CRDT-Array)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -14,9 +14,10 @@ FetchContent_MakeAvailable(googletest)
 add_executable(${PROJECT_NAME}
         main.cpp
         CrdtArray.h
-        Generators.h Server.h Client.h)
+        Generators.h
+        Server.h
+        Client.h)
 
 target_link_libraries(${PROJECT_NAME} gtest_main)
-add_test(NAME example_test COMMAND ${PROJECT_NAME})
 
 
